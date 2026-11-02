@@ -1,7 +1,8 @@
 pipeline {
   agent {
     docker {
-      image 'abhishekf5/maven-abhishek-docker-agent:v1'
+      // பழைய maven-abhishek-docker-agent-க்கு பதிலாக நவீன மற்றும் நிலையான Maven image-ஐப் பயன்படுத்துகிறோம்
+      image 'maven:3.8.8-eclipse-temurin-11-alpine'
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
@@ -22,12 +23,11 @@ pipeline {
     
     stage('Static Code Analysis') {
       environment {
-        // Updated SonarQube URL
         SONAR_URL = "http://100.53.4.201:9000"
       }
       steps {
         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          // maven sonar plugin-ன் முழு பெயரைக் (Full Goal) கொடுத்துள்ளோம்
+          // SonarQube plugin சரியாக இயங்க முழு plugin goal-ஐப் பயன்படுத்துகிறோம்
           sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
         }
       }
@@ -35,7 +35,6 @@ pipeline {
     
     stage('Build and Push Docker Image') {
       environment {
-        // Updated Docker Hub Username
         DOCKER_IMAGE = "kiruthigakanagaraj/ultimate-cicd:${BUILD_NUMBER}"
         REGISTRY_CREDENTIALS = credentials('docker-cred')
       }
@@ -52,7 +51,6 @@ pipeline {
     
     stage('Update Deployment File') {
         environment {
-            // Updated GitHub Repository and Username
             GIT_REPO_NAME = "ci-cd-end-to-end-project"
             GIT_USER_NAME = "kiruthiga2401"
         }
