@@ -1,13 +1,11 @@
-# You can change this base image to anything else
-# But make sure to use the correct version of Java
-FROM adoptopenjdk/openjdk11:alpine-jre
+# புதிய மற்றும் சரியான Java 11 Base Image
+FROM eclipse-temurin:11-jre-alpine
 
-# Simply the artifact path
-ARG artifact=target/spring-boot-web.jar
+# உங்கள் Maven build உருவாக்கிய உண்மையான Jar ஃபைலின் பெயரை இங்கே கொடுக்கவும்
+ARG artifact=target/*.jar
 
 WORKDIR /opt/app
 
 COPY ${artifact} app.jar
 
-# This should not be changed
 ENTRYPOINT ["java","-jar","app.jar"]
